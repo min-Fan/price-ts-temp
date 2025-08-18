@@ -1,0 +1,41 @@
+{
+  "name": "linkol-chart-generator",
+  "version": "1.0.0",
+  "description": "Linkol价格图表生成器",
+  "main": "chart-generator.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node chart-generator.ts",
+    "dev": "ts-node-dev --respawn chart-generator.ts",
+    "generate": "ts-node chart-generator.ts",
+    "single": "ts-node chart-generator.ts single",
+    "batch": "ts-node chart-generator.ts batch"
+  },
+  "keywords": [
+    "chart",
+    "puppeteer",
+    "typescript",
+    "linkol",
+    "kol"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^21.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "recharts": "^3.1.2",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
