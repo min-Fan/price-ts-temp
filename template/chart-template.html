@@ -25,6 +25,7 @@
         justify-content: center;
         gap: 8px;
         padding: 16px;
+        padding-bottom: 8px !important;
         border: 1px solid #e5e7eb;
         background: #ffffff;
         border-radius: 12px;
@@ -64,6 +65,13 @@
         height: 100%;
       }
 
+      .chart-description {
+        font-size: 12px;
+        color: #6b7280;
+        text-align: center;
+        line-height: 1.4;
+      }
+
       @media (min-width: 640px) {
         .chart-container {
           padding: 20px;
@@ -83,13 +91,14 @@
   <body>
     <div id="chart-container" class="chart-container">
       <h1 class="title">
-        <span id="username"></span> linkol price
+        <span id="username"></span>'s tweet value:
         <span id="current-price" class="price"></span>
       </h1>
       <p class="subtitle" id="leading-text"></p>
       <div class="chart-wrapper">
         <canvas id="chart-canvas" class="chart-canvas"></canvas>
       </div>
+      <p class="chart-description">price.linkol.ai</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -105,10 +114,20 @@
         ctx.scale(2, 2);
 
         // 处理数据
-        const chartData = data.bins.map((price, index) => ({
-          price: price,
-          value: index === 0 ? 0 : data.data[index - 1] || 0,
-        }));
+        // const chartData = data.bins.map((price, index) => ({
+        //   price: price,
+        //   value: index === 0 ? 0 : data.data[index - 1] || 0,
+        // }));
+        const chartData = [
+          { price: 100, value: 0 },
+          { price: 900, value: 50 },
+          { price: 1700, value: 230 },
+          { price: 2500, value: 310 }, // 最高点（第四个点，正中间）
+          { price: 3300, value: 230 },
+          { price: 4100, value: 50 },
+          { price: 4900, value: 20 },
+          { price: 10000, value: 0 },
+        ];
 
         // 创建图表
         const chart = new Chart(ctx, {
@@ -155,6 +174,7 @@
             },
             scales: {
               x: {
+                type: "linear",
                 display: true,
                 title: {
                   display: false,
@@ -208,7 +228,7 @@
                   const xAxis = chart.scales.x;
                   console.log("xAxis", xAxis);
                   // 计算 current_value 在 bins 范围内的相对位置
-                  const bins = data.bins;
+                  const bins = chartData.map((d) => d.price);
 
                   // 找到 current_value 所在的区间，处理超出范围的情况
                   let lowerIndex = 0;
@@ -245,12 +265,20 @@
                       }
                     }
 
-                    // 计算在这个区间内的百分比
-                    const percentage =
-                      (data.current_value - lowerBin) / (upperBin - lowerBin);
+                    // 在对数轴上计算位置
+                    // 使用对数插值来获得更准确的位置
+                    const logLower = Math.log(lowerBin);
+                    const logUpper = Math.log(upperBin);
+                    const logCurrent = Math.log(data.current_value);
 
-                    // 构造位置值：第几位.百分比
-                    positionValue = lowerIndex + percentage;
+                    // 计算在对数空间中的百分比
+                    const logPercentage =
+                      (logCurrent - logLower) / (logUpper - logLower);
+
+                    // 使用对数插值计算实际位置
+                    positionValue = Math.exp(
+                      logLower + logPercentage * (logUpper - logLower)
+                    );
                   }
 
                   console.log("Current value:", data.current_value);
@@ -293,7 +321,7 @@
                   // 绘制头像
                   const avatarImg = new Image();
                   avatarImg.crossOrigin = "anonymous";
-                  
+
                   // 创建Promise来等待图片加载完成
                   const avatarPromise = new Promise((resolve, reject) => {
                     avatarImg.onload = function () {
@@ -316,7 +344,7 @@
 
                   // 将Promise存储到图表实例中，供外部等待
                   chart.avatarLoadPromise = avatarPromise;
-                  
+
                   // 添加渲染完成标记
                   chart.avatarRendered = true;
                 } else {
@@ -343,18 +371,18 @@
           "current-price"
         ).textContent = `$${data.current_value}`;
 
-        let leadingText = "Leading other KOL (";
-        if (data.leading_percentage >= 0 && data.leading_percentage < 30) {
-          leadingText += "Bottom ";
-        } else if (
-          data.leading_percentage > 30 &&
-          data.leading_percentage < 70
-        ) {
-          leadingText += "Middle ";
-        } else {
-          leadingText += "Top ";
-        }
-        leadingText += `${data.leading_percentage}%)`;
+        let leadingText = "AI ranks you above ";
+        // if (data.leading_percentage >= 0 && data.leading_percentage < 30) {
+        //   leadingText += "Bottom ";
+        // } else if (
+        //   data.leading_percentage > 30 &&
+        //   data.leading_percentage < 70
+        // ) {
+        //   leadingText += "Middle ";
+        // } else {
+        //   leadingText += "Top ";
+        // }
+        leadingText += `${data.leading_percentage}% of KOLs`;
 
         document.getElementById("leading-text").textContent = leadingText;
       }
@@ -383,12 +411,16 @@
       };
 
       // 等待头像加载完成的函数
-      window.waitForAvatarLoad = function() {
-        const chartCanvas = document.getElementById('chart-canvas');
-        if (chartCanvas && chartCanvas.chart && chartCanvas.chart.avatarLoadPromise) {
+      window.waitForAvatarLoad = function () {
+        const chartCanvas = document.getElementById("chart-canvas");
+        if (
+          chartCanvas &&
+          chartCanvas.chart &&
+          chartCanvas.chart.avatarLoadPromise
+        ) {
           return chartCanvas.chart.avatarLoadPromise.then(() => {
             // 等待一小段时间确保渲染完成
-            return new Promise(resolve => setTimeout(resolve, 500));
+            return new Promise((resolve) => setTimeout(resolve, 500));
           });
         }
         return Promise.resolve();
@@ -397,28 +429,28 @@
       window.exportChartImage = exportToImage;
 
       // 测试数据
-    //   updateContent({
-    //     kol: {
-    //       screen_name: "elonmusk",
-    //       profile_image_url:
-    //         "https://pbs.twimg.com/profile_images/1446320520480190472/WOO07ult_normal.jpg",
-    //     },
-    //     current_value: 10000,
-    //     leading_percentage: 50,
-    //     bins: [100, 1750, 3400, 5050, 6700, 8350, 10000],
-    //     data: [249, 25, 5, 4, 0, 0],
-    //   });
-    //   renderChart({
-    //     kol: {
-    //       screen_name: "elonmusk",
-    //       profile_image_url:
-    //         "https://pbs.twimg.com/profile_images/1446320520480190472/WOO07ult_normal.jpg",
-    //     },
-    //     current_value: 10000,
-    //     leading_percentage: 50,
-    //     bins: [100, 1750, 3400, 5050, 6700, 8350, 10000],
-    //     data: [249, 25, 5, 4, 0, 0],
-    //   });
+      // updateContent({
+      //   kol: {
+      //     screen_name: "elonmusk",
+      //     profile_image_url:
+      //       "https://pbs.twimg.com/profile_images/1446320520480190472/WOO07ult_normal.jpg",
+      //   },
+      //   current_value: 3500,
+      //   leading_percentage: 50,
+      //   bins: [100, 1750, 3400, 5050, 6700, 8350, 10000],
+      //   data: [249, 25, 5, 4, 0, 0],
+      // });
+      // renderChart({
+      //   kol: {
+      //     screen_name: "elonmusk",
+      //     profile_image_url:
+      //       "https://pbs.twimg.com/profile_images/1446320520480190472/WOO07ult_normal.jpg",
+      //   },
+      //   current_value: 3500,
+      //   leading_percentage: 50,
+      //   bins: [100, 1750, 3400, 5050, 6700, 8350, 10000],
+      //   data: [249, 25, 5, 4, 0, 0],
+      // });
     </script>
   </body>
 </html>

@@ -1,6 +1,14 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
+
+// 加载环境变量
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+// 从环境变量读取API配置
+const API_BASE_URL = process.env.API_BASE_URL;
+const API_PATH = process.env.API_PATH;
 
 // 定义数据类型
 interface Kol {
@@ -23,29 +31,28 @@ async function getPriceData(screenName: string): Promise<IGetPriceData> {
   try {
     // 尝试调用真实API
     const response = await fetch(
-      `https://intentapi.agtchain.net/kol/api/v4/price/?screen_name=${screenName}`
+      `${API_BASE_URL}${API_PATH}?screen_name=${screenName}`
     );
-    
+
     // 检查响应状态
     if (!response.ok) {
       console.log(`API请求失败 (${response.status}): ${response.statusText}`);
-      console.log('使用模拟数据...');
       throw new Error(`API请求失败: ${response.status}`);
     }
-    
+
     const responseData = await response.json();
-    
+
     // 检查API返回的数据结构
     if (responseData.code === 200 && responseData.data) {
       // API 成功返回数据，直接返回 data 部分
       return responseData.data;
     } else {
       // API 返回错误状态
-      console.log(`API返回错误: ${responseData.msg || '未知错误'}`);
-      throw new Error(`API返回错误: ${responseData.msg || '未知错误'}`);
+      console.log(`API返回错误: ${responseData.msg || "未知错误"}`);
+      throw new Error(`API返回错误: ${responseData.msg || "未知错误"}`);
     }
   } catch (error: any) {
-    console.log('API调用失败，使用模拟数据:', error.message);
+    console.log("API调用失败:", error.message);
     throw error;
   }
 }
@@ -60,12 +67,12 @@ async function generateChartImage(
 
     // 获取数据
     const data = await getPriceData(screenName);
-    
+
     // 验证数据结构
     if (!data || !data.kol || !data.kol.screen_name) {
       throw new Error(`数据格式无效: ${JSON.stringify(data)}`);
     }
-    
+
     console.log("数据获取成功:", {
       username: data.kol.screen_name,
       currentValue: data.current_value,
@@ -117,7 +124,7 @@ async function generateChartImage(
           // 使用全局等待函数
           return (window as any).waitForAvatarLoad();
         }),
-        new Promise(resolve => setTimeout(resolve, 10000)) // 10秒超时
+        new Promise((resolve) => setTimeout(resolve, 10000)), // 10秒超时
       ]);
       console.log("头像图片加载完成");
     } catch (error) {
@@ -202,14 +209,23 @@ function printUsage() {
   );
 }
 
-function parseArgs(argv: string[]): { mode: "single" | "batch"; username?: string; jsonPath?: string; outDir: string } | null {
+function parseArgs(
+  argv: string[]
+): {
+  mode: "single" | "batch";
+  username?: string;
+  jsonPath?: string;
+  outDir: string;
+} | null {
   const args = argv.slice(2);
   if (args.length === 0) return null;
 
   const getOutDir = (): string => {
     const idxO = args.findIndex((a) => a === "-o" || a === "--out");
     if (idxO !== -1 && args[idxO + 1]) {
-      return path.isAbsolute(args[idxO + 1]) ? args[idxO + 1] : path.join(process.cwd(), args[idxO + 1]);
+      return path.isAbsolute(args[idxO + 1])
+        ? args[idxO + 1]
+        : path.join(process.cwd(), args[idxO + 1]);
     }
     return path.join(__dirname, "output");
   };
@@ -223,7 +239,9 @@ function parseArgs(argv: string[]): { mode: "single" | "batch"; username?: strin
   if (args[0] === "batch") {
     const jsonPath = args[1];
     if (!jsonPath) return null;
-    const abs = path.isAbsolute(jsonPath) ? jsonPath : path.join(process.cwd(), jsonPath);
+    const abs = path.isAbsolute(jsonPath)
+      ? jsonPath
+      : path.join(process.cwd(), jsonPath);
     return { mode: "batch", jsonPath: abs, outDir: getOutDir() };
   }
 
@@ -242,7 +260,9 @@ function readUserListFromJson(jsonFilePath: string): string[] {
   if (parsed && Array.isArray(parsed.screen_names)) {
     return parsed.screen_names as string[];
   }
-  throw new Error("JSON 格式不正确，应为字符串数组，或包含 users/screen_names 字段的对象");
+  throw new Error(
+    "JSON 格式不正确，应为字符串数组，或包含 users/screen_names 字段的对象"
+  );
 }
 
 // 主函数（CLI 入口）
