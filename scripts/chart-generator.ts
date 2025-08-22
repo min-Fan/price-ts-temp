@@ -4,7 +4,7 @@ import path from "path";
 import dotenv from "dotenv";
 
 // 加载环境变量
-dotenv.config({ path: path.join(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 // 从环境变量读取API配置
 const API_BASE_URL = process.env.API_BASE_URL;
@@ -96,6 +96,7 @@ async function generateChartImage(
     // 读取HTML模板
     const templatePath = path.join(
       __dirname,
+      "..",
       "template",
       "chart-template.html"
     );
@@ -227,7 +228,7 @@ function parseArgs(
         ? args[idxO + 1]
         : path.join(process.cwd(), args[idxO + 1]);
     }
-    return path.join(__dirname, "output");
+    return path.join(__dirname, "..", "output");
   };
 
   if (args[0] === "single") {

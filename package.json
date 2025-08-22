@@ -1,15 +1,22 @@
 {
-  "name": "linkol-chart-generator",
+  "name": "linkol-generators",
   "version": "1.0.0",
-  "description": "Linkol价格图表生成器",
-  "main": "chart-generator.ts",
+  "description": "Linkol价格图表和卡片生成器",
+  "main": "scripts/chart-generator.ts",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node chart-generator.ts",
-    "dev": "ts-node-dev --respawn chart-generator.ts",
-    "generate": "ts-node chart-generator.ts",
-    "single": "ts-node chart-generator.ts single",
-    "batch": "ts-node chart-generator.ts batch"
+    "chart": "ts-node scripts/chart-generator.ts",
+    "card": "ts-node scripts/linkol-card-generator.ts",
+    "chart:single": "ts-node scripts/chart-generator.ts single",
+    "chart:batch": "ts-node scripts/chart-generator.ts batch",
+    "card:single": "ts-node scripts/linkol-card-generator.ts single",
+    "card:batch": "ts-node scripts/linkol-card-generator.ts batch",
+    "dev:chart": "ts-node-dev --respawn scripts/chart-generator.ts",
+    "dev:card": "ts-node-dev --respawn scripts/linkol-card-generator.ts",
+    "generate:chart": "npm run chart:single",
+    "generate:card": "npm run card:single",
+    "batch:chart": "npm run chart:batch",
+    "batch:card": "npm run card:batch"
   },
   "keywords": [
     "chart",
