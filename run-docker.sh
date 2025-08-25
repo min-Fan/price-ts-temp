@@ -11,6 +11,16 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
+# 确保 output 目录存在并有正确的权限
+if [ ! -d "output" ]; then
+    echo "📁 创建 output 目录..."
+    mkdir -p output
+fi
+
+# 设置 output 目录权限
+echo "🔐 设置 output 目录权限..."
+chmod 755 output
+
 # 构建镜像（如果不存在）
 if [[ "$(docker images -q price-ts-generator 2> /dev/null)" == "" ]]; then
     echo "🔨 构建 Docker 镜像..."
