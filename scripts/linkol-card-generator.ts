@@ -88,9 +88,18 @@ async function generateLinkolCardImage(
     // 启动浏览器
     const browser = await puppeteer.launch({
       headless: "new",
-      executablePath:
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // 在 Docker 环境中指定 Chrome 路径
+      executablePath: "/usr/bin/google-chrome-stable",
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--no-first-run",
+        "--no-zygote",
+        "--single-process",
+        "--disable-extensions"
+      ],
     });
 
     const page = await browser.newPage();
@@ -105,14 +114,58 @@ async function generateLinkolCardImage(
       "template",
       "linkol-card-template.html"
     );
-    const htmlContent = fs.readFileSync(templatePath, "utf-8");
+    let htmlContent = fs.readFileSync(templatePath, "utf-8");
 
-    // 使用文件协议加载HTML模板，这样可以正确加载本地资源文件
-    const fileUrl = `file://${templatePath}`;
-    await page.goto(fileUrl);
+    // 读取并嵌入本地资源文件
+    const assetsDir = path.join(__dirname, "..", "template", "assets");
+    
+    // 读取背景图片并转换为 base64
+    const bgImagePath = path.join(assetsDir, "img", "card-bg.png");
+    const bgImageBuffer = fs.readFileSync(bgImagePath);
+    const bgImageBase64 = `data:image/png;base64,${bgImageBuffer.toString('base64')}`;
+    
+    // 读取字体文件并转换为 base64
+    const fontPath = path.join(assetsDir, "font", "KyivTypeSerif-VarGX.ttf");
+    const fontBuffer = fs.readFileSync(fontPath);
+    const fontBase64 = `data:font/ttf;base64,${fontBuffer.toString('base64')}`;
+    
+    // 读取 img 目录下的 PNG 图片并转换为 base64
+    const logoBorderPath = path.join(assetsDir, "img", "logo-border.png");
+    const logoBorderBuffer = fs.readFileSync(logoBorderPath);
+    const logoBorderBase64 = `data:image/png;base64,${logoBorderBuffer.toString('base64')}`;
+    
+    const linkolLogoPath = path.join(assetsDir, "img", "linkol-logoicon-light.png");
+    const linkolLogoBuffer = fs.readFileSync(linkolLogoPath);
+    const linkolLogoBase64 = `data:image/png;base64,${linkolLogoBuffer.toString('base64')}`;
+    
+    const linkolHorizontalPath = path.join(assetsDir, "img", "linkol-horizontal-light.png");
+    const linkolHorizontalBuffer = fs.readFileSync(linkolHorizontalPath);
+    const linkolHorizontalBase64 = `data:image/png;base64,${linkolHorizontalBuffer.toString('base64')}`;
+    
+    htmlContent = htmlContent
+      .replace('./assets/img/card-bg.png', bgImageBase64)
+      .replace('./assets/img/logo-border.png', logoBorderBase64)
+      .replace('./assets/img/linkol-logoicon-light.svg', linkolLogoBase64)
+      .replace('./assets/img/linkol-horizontal-light.svg', linkolHorizontalBase64);
+    
+    // 添加内联字体样式
+    const fontStyle = `
+      <style>
+        @font-face {
+          font-family: 'KyivTypeSerif';
+          src: url('${fontBase64}') format('truetype');
+        }
+      </style>
+    `;
+    
+    // 在 head 标签后插入字体样式
+    htmlContent = htmlContent.replace('</head>', `${fontStyle}</head>`);
 
-    // 等待页面和资源文件加载完成
-    await page.waitForTimeout(2000);
+    // 设置HTML内容
+    await page.setContent(htmlContent);
+
+    // 等待页面完全加载
+    await page.waitForTimeout(1000);
 
     // 更新卡片内容
     await page.evaluate(

@@ -98,7 +98,7 @@
       <div class="chart-wrapper">
         <canvas id="chart-canvas" class="chart-canvas"></canvas>
       </div>
-      <p class="chart-description">price.linkol.ai</p>
+      <p class="chart-description">check.linkol.fun</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -113,11 +113,7 @@
         canvas.height = canvas.offsetHeight * 2;
         ctx.scale(2, 2);
 
-        // 处理数据
-        // const chartData = data.bins.map((price, index) => ({
-        //   price: price,
-        //   value: index === 0 ? 0 : data.data[index - 1] || 0,
-        // }));
+        // 处理数据 - 生成更平滑的曲线数据
         const chartData = [
           { price: 100, value: 0 },
           { price: 900, value: 50 },
@@ -142,8 +138,9 @@
                 backgroundColor: "rgba(59, 130, 246, 0.1)",
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4,
-                pointRadius: 3,
+                tension: 1.0,
+                pointRadius: 0,
+                cubicInterpolationMode: "monotone",
                 pointBackgroundColor: "#3b82f6",
                 pointBorderColor: "#ffffff",
                 pointBorderWidth: 2,

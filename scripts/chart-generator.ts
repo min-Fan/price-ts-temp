@@ -81,9 +81,18 @@ async function generateChartImage(
     // 启动浏览器
     const browser = await puppeteer.launch({
       headless: "new",
-      executablePath:
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // 在 Docker 环境中指定 Chrome 路径
+      executablePath: "/usr/bin/google-chrome-stable",
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--no-first-run",
+        "--no-zygote",
+        "--single-process",
+        "--disable-extensions"
+      ],
     });
 
     const page = await browser.newPage();
