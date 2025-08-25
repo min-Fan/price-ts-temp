@@ -18,10 +18,8 @@ interface Kol {
 }
 
 interface IGetPriceData {
-  bins: number[];
   current_bin: number;
   current_value: number;
-  data: number[];
   kol: Kol;
   leading_percentage: number;
 }

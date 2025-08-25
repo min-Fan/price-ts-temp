@@ -18,10 +18,8 @@ interface Kol {
 }
 
 interface IGetPriceData {
-  bins: number[];
   current_bin: number;
   current_value: number;
-  data: number[];
   kol: Kol;
   leading_percentage: number;
 }
@@ -117,43 +115,48 @@ async function generateLinkolCardImage(
     await page.waitForTimeout(2000);
 
     // 更新卡片内容
-    await page.evaluate((cardData) => {
-      // 更新日期
-      const dateElement = document.getElementById('date');
-      if (dateElement) {
-        dateElement.textContent = cardData.date;
-      }
+    await page.evaluate(
+      (cardData) => {
+        // 更新日期
+        const dateElement = document.getElementById("date");
+        if (dateElement) {
+          dateElement.textContent = cardData.date;
+        }
 
-      // 更新用户名
-      const usernameElement = document.getElementById('username');
-      if (usernameElement) {
-        usernameElement.textContent = `@${cardData.username}`;
-      }
+        // 更新用户名
+        const usernameElement = document.getElementById("username");
+        if (usernameElement) {
+          usernameElement.textContent = `@${cardData.username}`;
+        }
 
-      // 更新价格
-      const priceElement = document.getElementById('price');
-      if (priceElement) {
-        priceElement.textContent = `$${cardData.price.toLocaleString()}`;
-      }
+        // 更新价格
+        const priceElement = document.getElementById("price");
+        if (priceElement) {
+          priceElement.textContent = `$${cardData.price.toLocaleString()}`;
+        }
 
-      // 更新品牌名称
-      const brandElement = document.getElementById('brand-name');
-      if (brandElement) {
-        brandElement.textContent = cardData.brandName;
-      }
+        // 更新品牌名称
+        const brandElement = document.getElementById("brand-name");
+        if (brandElement) {
+          brandElement.textContent = cardData.brandName;
+        }
 
-      // 更新用户头像
-      const avatarElement = document.getElementById('user-avatar') as HTMLImageElement;
-      if (avatarElement && cardData.avatarUrl) {
-        avatarElement.src = cardData.avatarUrl;
+        // 更新用户头像
+        const avatarElement = document.getElementById(
+          "user-avatar"
+        ) as HTMLImageElement;
+        if (avatarElement && cardData.avatarUrl) {
+          avatarElement.src = cardData.avatarUrl;
+        }
+      },
+      {
+        date: new Date().toISOString().split("T")[0].replace(/-/g, "."),
+        username: data.kol.screen_name,
+        price: data.current_value,
+        brandName: data.kol.name,
+        avatarUrl: data.kol.profile_image_url.replace("_normal", ""),
       }
-    }, {
-      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      username: data.kol.screen_name,
-      price: data.current_value,
-      brandName: data.kol.name,
-      avatarUrl: data.kol.profile_image_url.replace('_normal', '')
-    });
+    );
 
     // 等待内容更新完成
     await page.waitForTimeout(500);
@@ -161,13 +164,18 @@ async function generateLinkolCardImage(
     // 等待头像图片加载完成
     try {
       console.log("等待头像图片加载...");
-      await page.waitForFunction(() => {
-        const avatar = document.getElementById('user-avatar') as HTMLImageElement;
-        if (!avatar) return false;
-        
-        // 检查图片是否加载完成
-        return avatar.complete && avatar.naturalWidth > 0;
-      }, { timeout: 10000 }); // 10秒超时
+      await page.waitForFunction(
+        () => {
+          const avatar = document.getElementById(
+            "user-avatar"
+          ) as HTMLImageElement;
+          if (!avatar) return false;
+
+          // 检查图片是否加载完成
+          return avatar.complete && avatar.naturalWidth > 0;
+        },
+        { timeout: 10000 }
+      ); // 10秒超时
       console.log("头像图片加载完成");
     } catch (error) {
       console.log("头像加载失败或超时，继续截图:", error);
@@ -254,9 +262,7 @@ function printUsage() {
   );
 }
 
-function parseArgs(
-  argv: string[]
-): {
+function parseArgs(argv: string[]): {
   mode: "single" | "batch";
   username?: string;
   jsonPath?: string;
@@ -278,7 +284,7 @@ function parseArgs(
   if (args[0] === "single") {
     const username = args[1];
     if (!username) return null;
-    
+
     return { mode: "single", username, outDir: getOutDir() };
   }
 
@@ -297,16 +303,16 @@ function parseArgs(
 function readUserListFromJson(jsonFilePath: string): string[] {
   const raw = fs.readFileSync(jsonFilePath, "utf-8");
   const parsed = JSON.parse(raw);
-  
+
   if (Array.isArray(parsed)) {
     // 如果是字符串数组，直接返回
-    if (typeof parsed[0] === 'string') {
+    if (typeof parsed[0] === "string") {
       return parsed as string[];
     }
     // 如果是对象数组，提取用户名字段（向后兼容）
-    return parsed.map(item => item.username || item.screen_name || item.name);
+    return parsed.map((item) => item.username || item.screen_name || item.name);
   }
-  
+
   throw new Error("JSON 格式不正确，应为字符串数组或对象数组");
 }
 
@@ -345,8 +351,4 @@ if (require.main === module) {
 }
 
 // 导出函数供其他模块使用
-export {
-  generateLinkolCardImage,
-  generateMultipleCards,
-  LinkolCardData,
-};
+export { generateLinkolCardImage, generateMultipleCards, LinkolCardData };

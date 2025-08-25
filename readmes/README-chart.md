@@ -159,10 +159,8 @@ const response = await fetch(
 ### 数据结构
 ```typescript
 interface IGetPriceData {
-  bins: number[];              // 价格区间
   current_bin: number;         // 当前价格区间
   current_value: number;       // 当前价格
-  data: number[];              // 各区间用户数量
   kol: Kol;                    // KOL信息
   leading_percentage: number;  // 领先百分比
 }

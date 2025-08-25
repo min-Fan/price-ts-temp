@@ -118,10 +118,8 @@ Linkol 卡片生成器现在与现有的图表生成器使用相同的 API 接�
 
 ```typescript
 interface IGetPriceData {
-  bins: number[];
   current_bin: number;
   current_value: number;      // 用户当前价格
-  data: number[];
   kol: {
     name: string;
     profile_image_url: string;
