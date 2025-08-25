@@ -5,6 +5,17 @@
   "main": "scripts/chart-generator.ts",
   "scripts": {
     "build": "tsc",
+    "start": "ts-node server.ts",
+    "dev": "ts-node-dev --respawn server.ts",
+    "docker:start": "./run.sh",
+    "docker:stop": "docker-compose down",
+    "docker:restart": "docker-compose restart",
+    "docker:status": "docker-compose ps",
+    "docker:logs": "docker-compose logs -f",
+    "docker:build": "docker-compose build",
+    "docker:clean": "docker-compose down --rmi all --volumes --remove-orphans",
+    "script:chart": "ts-node scripts/run-script.ts chart",
+    "script:card": "ts-node scripts/run-script.ts card",
     "chart": "ts-node scripts/chart-generator.ts",
     "card": "ts-node scripts/linkol-card-generator.ts",
     "chart:single": "ts-node scripts/chart-generator.ts single",
@@ -16,7 +27,7 @@
     "generate:chart": "npm run chart:single",
     "generate:card": "npm run card:single",
     "batch:chart": "npm run chart:batch",
-    "batch:card": "npm run card:batch"
+    "batch:card": "npm run chart:batch"
   },
   "keywords": [
     "chart",
@@ -28,8 +39,14 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
     "@types/node-fetch": "^2.6.13",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "puppeteer": "^21.0.0",
     "react": "^19.1.1",

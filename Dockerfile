@@ -25,28 +25,31 @@ RUN npm ci --only=production
 
 # 复制源代码和模板
 COPY scripts/ ./scripts/
+COPY routes/ ./routes/
 COPY template/ ./template/
 COPY tsconfig.json ./
+COPY server.ts ./
 COPY .env* ./
 
-# 创建输出目录并设置权限
-RUN mkdir -p output
+# 创建必要的目录
+RUN mkdir -p output uploads
 
 # 安装 TypeScript 和 ts-node（开发依赖）
 RUN npm install -g typescript ts-node
 
 # 设置环境变量
 ENV NODE_ENV=production
-# 不设置 PUPPETEER_EXECUTABLE_PATH，让 Puppeteer 使用内置的 Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+ENV PORT=3000
 
 # 设置目录权限，让任何用户都能写入
-RUN chmod 777 output && chmod 777 /app
+RUN chmod 777 output && chmod 777 uploads && chmod 777 /app
 
 # 切换回 puppeteer 用户（官方镜像推荐）
 USER pptruser
 
-# 暴露端口（如果需要的话）
-EXPOSE 3000
+# 暴露端口（通过环境变量动态配置）
+EXPOSE ${PORT:-3000}
 
-# 设置默认命令
-CMD ["ts-node", "scripts/chart-generator.ts", "--help"]
+# 设置默认命令（可以通过环境变量覆盖）
+CMD ["ts-node", "server.ts"]

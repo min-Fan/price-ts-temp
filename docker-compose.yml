@@ -1,9 +1,43 @@
 version: '3.8'
 
 services:
-  price-generator:
+  # API服务 - 提供Web接口
+  linkol-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: linkol-api-service
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-3000}
+      - API_BASE_URL=${API_BASE_URL}
+      - API_PATH=${API_PATH}
+    volumes:
+      - ./output:/app/output
+      - ./uploads:/app/uploads
+      - ./.env:/app/.env:ro
+      - ./template:/app/template:ro
+    restart: unless-stopped
+    # 限制内存使用
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 统一的服务 - 合并manager和price-generator功能
+  linkol-service:
     build: .
-    container_name: price-ts-generator
+    container_name: linkol-unified-service
     environment:
       - NODE_ENV=production
       - API_BASE_URL=${API_BASE_URL}
@@ -13,28 +47,21 @@ services:
       - ./output:/app/output
       # 挂载环境变量文件
       - ./.env:/app/.env:ro
+      # 挂载模板文件
+      - ./template:/app/template:ro
       # 如果需要挂载用户数据文件
       - ./sample-card-data.json:/app/sample-card-data.json:ro
     working_dir: /app
     
-    # 运行命令示例
-    # 生成单个用户图表
-    # command: ["ts-node", "scripts/chart-generator.ts", "single", "username"]
+    # 使用更轻量的命令，减少内存占用
+    command: ["tail", "-f", "/dev/null"]
     
-    # 批量生成图表
-    # command: ["ts-node", "scripts/chart-generator.ts", "batch", "sample-card-data.json"]
-    
-    # 生成单个用户卡片
-    # command: ["ts-node", "scripts/linkol-card-generator.ts", "single", "username"]
-    
-    # 批量生成卡片
-    # command: ["ts-node", "scripts/linkol-card-generator.ts", "batch", "sample-card-data.json"]
-    
-    # 默认显示帮助信息
-    command: ["ts-node", "scripts/chart-generator.ts", "--help"]
-    
-    # 如果需要交互式运行，可以取消注释下面的行
-    # stdin_open: true
-    # tty: true
+    # 限制内存使用
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
     
     restart: unless-stopped

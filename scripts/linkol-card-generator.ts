@@ -88,9 +88,9 @@ async function generateLinkolCardImage(
     // 启动浏览器
     const browser = await puppeteer.launch({
       headless: "new",
-      // 在 Docker 环境中指定 Chrome 路径
-      executablePath: "/usr/bin/google-chrome-stable",
-      args: [
+      // 根据环境变量决定Chrome路径
+      executablePath: process.env.NODE_ENV === 'production' ? "/usr/bin/google-chrome-stable" : undefined,
+      args: process.env.NODE_ENV === 'production' ? [
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
@@ -99,7 +99,7 @@ async function generateLinkolCardImage(
         "--no-zygote",
         "--single-process",
         "--disable-extensions"
-      ],
+      ] : [],
     });
 
     const page = await browser.newPage();

@@ -17,6 +17,7 @@
   },
   "include": [
     "scripts/**/*.ts",
+    "server.ts",
     "types/**/*.d.ts"
   ],
   "exclude": [
