@@ -26,6 +26,9 @@ price-ts-temp/
 │       ├── img/                      # 🖼️ 背景图片
 │       └── font/                     # 🔤 自定义字体
 ├── output/                            # 📤 输出文件夹（根目录）
+├── Dockerfile                         # 🐳 Docker镜像配置
+├── docker-compose.yml                 # 🐳 Docker Compose配置
+├── run-docker.sh                      # 🐳 Docker运行脚本
 ├── package.json                       # ⚙️ 项目配置
 ├── tsconfig.json                      # 🔧 TypeScript配置
 ├── .env                               # 🔐 环境变量配置
@@ -34,18 +37,60 @@ price-ts-temp/
 
 ## 🚀 快速开始
 
-### 安装依赖
+### 方式一：本地运行
+
+#### 安装依赖
 ```bash
 npm install
 # 或
 yarn install
 ```
 
-### 环境配置
+#### 环境配置
 创建 `.env` 文件：
 ```env
 API_BASE_URL=https://your-api-domain.com
 API_PATH=/api/price
+```
+
+### 方式二：Docker 部署（推荐）
+
+#### 使用运行脚本（最简单）
+```bash
+# 查看帮助信息
+./run-docker.sh help
+
+# 生成单个用户图表
+./run-docker.sh chart-single username
+
+# 批量生成图表
+./run-docker.sh chart-batch sample-card-data.json
+
+# 生成单个用户卡片
+./run-docker.sh card-single username
+
+# 批量生成卡片
+./run-docker.sh card-batch sample-card-data.json
+```
+
+#### 直接使用 Docker 命令
+```bash
+# 构建镜像
+docker build -t price-ts-generator .
+
+# 生成单个用户图表
+docker run --rm \
+  -v "$(pwd)/output:/app/output" \
+  -v "$(pwd)/.env:/app/.env:ro" \
+  price-ts-generator \
+  ts-node scripts/chart-generator.ts single username
+
+# 生成单个用户卡片
+docker run --rm \
+  -v "$(pwd)/output:/app/output" \
+  -v "$(pwd)/.env:/app/.env:ro" \
+  price-ts-generator \
+  ts-node scripts/linkol-card-generator.ts single username
 ```
 
 ## 📊 价格图表生成
@@ -196,6 +241,12 @@ npm run chart:batch users.json -o ./charts-output
 - 支持透明背景
 - 自动等待资源加载完成
 
+### Docker 支持
+- 使用官方 Puppeteer + Chromium 镜像，避免依赖问题
+- 自动处理本地资源文件（背景图、字体、图片）
+- 支持批量生成，提高生产效率
+- 环境一致性，确保在不同服务器上运行结果一致
+
 ## 🛠️ 开发
 
 ### 构建项目
@@ -230,6 +281,12 @@ npx tsc --noEmit
 1. **环境变量未设置**: 确保 `.env` 文件存在且包含正确的 API 配置
 2. **头像加载失败**: 脚本会自动处理头像加载超时，继续生成图片
 3. **输出目录权限**: 确保有权限写入指定的输出目录
+
+### Docker 相关问题
+1. **Chrome 启动失败**: 使用官方 Puppeteer 镜像，已预装 Chrome
+2. **资源文件加载失败**: 所有本地资源已转换为 base64 格式内联
+3. **平台兼容性**: 支持 Linux/amd64 和 Linux/arm64 平台
+4. **内存不足**: 建议至少 2GB 可用内存运行 Docker 容器
 
 ### 调试模式
 使用开发模式命令可以实时查看生成过程：
