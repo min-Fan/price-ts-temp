@@ -30,7 +30,7 @@ COPY tsconfig.json ./
 COPY .env* ./
 
 # 创建输出目录并设置权限
-RUN mkdir -p output && chown -R pptruser:pptruser /app
+RUN mkdir -p output
 
 # 安装 TypeScript 和 ts-node（开发依赖）
 RUN npm install -g typescript ts-node
@@ -39,8 +39,8 @@ RUN npm install -g typescript ts-node
 ENV NODE_ENV=production
 # 不设置 PUPPETEER_EXECUTABLE_PATH，让 Puppeteer 使用内置的 Chromium
 
-# 确保output目录有正确的权限
-RUN chmod 755 output
+# 设置目录权限，让任何用户都能写入
+RUN chmod 777 output && chmod 777 /app
 
 # 切换回 puppeteer 用户（官方镜像推荐）
 USER pptruser

@@ -19,7 +19,7 @@ fi
 
 # 设置 output 目录权限
 echo "🔐 设置 output 目录权限..."
-chmod 755 output
+chmod 777 output
 
 # 构建镜像（如果不存在）
 if [[ "$(docker images -q price-ts-generator 2> /dev/null)" == "" ]]; then
