@@ -166,7 +166,6 @@ docker exec -it linkol-unified-service npm run script:card -- <username>
 # 服务器配置
 PORT=3000                              # 服务端口
 NODE_ENV=production                    # 环境模式
-USE_RELATIVE_PATHS=true               # 启用相对路径
 
 # API配置
 API_BASE_URL=https://your-api.com     # API基础URL
@@ -341,7 +340,6 @@ npm run chart:batch -o ./charts-output
 - `API_PATH`: API路径
 - `PORT`: 服务端口
 - `NODE_ENV`: 环境模式
-- `USE_RELATIVE_PATHS`: 是否使用相对路径
 
 ## 🔍 技术特性
 
