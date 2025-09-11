@@ -22,75 +22,90 @@
       };
     </script>
   </head>
-  <body class="min-h-screen flex items-center justify-center p-4">
+  <body class="min-h-screen p-0">
     <div
       id="linkol-card"
-      class="relative w-[800px] min-h-[1200px] border-linkol-blue overflow-hidden"
+      class="relative w-[1500px] min-w-[1500px] h-[1500px] min-h-[1500px] flex items-center justify-center flex-col"
     >
-      <!-- 背景图片 -->
       <div class="absolute inset-0 w-full h-full z-[-1]">
         <img
-          src="./assets/img/card-bg.png"
-          alt="Card Background"
+          src="./assets/img/download-card-bg.png"
+          alt="Card Download Background"
           class="w-full h-full"
         />
       </div>
-
-      <!-- 日期 -->
       <div
-        id="date"
-        class="text-white text-[23px] font-medium font-kyiv z-10 flex justify-end p-4 pb-0"
+        class="relative w-[800px] h-[1200px] border-linkol-blue overflow-hidden"
       >
-        2025.08.21
-      </div>
+        <!-- 背景图片 -->
+        <div class="absolute inset-0 w-full h-full z-[-1]">
+          <img
+            src="./assets/img/card-bg.png"
+            alt="Card Background"
+            class="w-full h-full"
+          />
+        </div>
 
-      <!-- 中央Logo区域 -->
-      <div class="flex flex-col items-center z-10 mt-[145px]">
-        <!-- Logo背景圆圈 -->
-        <div class="flex items-center justify-center mb-8 relative p-10">
-          <div class="absolute inset-0 w-full h-full z-1">
-            <img
-              src="./assets/img/logo-border.png"
-              alt="Card Background"
-              class="w-full h-full"
-            />
+        <!-- 日期 -->
+        <div
+          id="date"
+          class="text-[#007AFF] text-[23px] font-medium font-kyiv z-10 flex justify-end p-4 pb-0"
+        >
+          2025.08.21
+        </div>
+
+        <!-- 中央Logo区域 -->
+        <div class="flex flex-col items-center z-10 mt-[50px]">
+          <!-- Logo背景圆圈 -->
+          <div class="flex items-center justify-center mb-8 relative p-10">
+            <div class="absolute inset-0 w-full h-full z-1">
+              <img
+                src="./assets/img/logo-border.png"
+                alt="Card Background"
+                class="w-full h-full"
+              />
+            </div>
+
+            <!-- 用户头像 -->
+            <div
+              class="bg-white rounded-[15px] overflow-hidden flex items-center justify-center w-[500px] h-[500px]"
+            >
+              <img
+                id="user-avatar"
+                src="./assets/img/linkol-logoicon-light.svg"
+                alt="User Avatar"
+                class="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
-          <!-- 用户头像 -->
-          <div
-            class="bg-white rounded-[15px] overflow-hidden flex items-center justify-center w-[375px] h-[375px]"
-          >
-            <img
-              id="user-avatar"
-              src="./assets/img/linkol-logoicon-light.svg"
-              alt="User Avatar"
-              class="w-full h-full object-cover"
-            />
+          <!-- 价格显示 -->
+          <div class="flex justify-center items-center flex-col">
+            <div id="price" class="text-white text-[103px] font-bold font-kyiv">
+              $12,686
+            </div>
+            <span class="text-[#007AFF] text-[20px] font-medium font-kyiv"
+              >Single Tweet Value by AI</span
+            >
           </div>
         </div>
 
-        <!-- 品牌名称 -->
-        <div class="text-white text-center font-kyiv">
-          <div id="brand-name" class="text-[53px] font-bold mb-1">Linkol</div>
-          <div id="username" class="text-[31px] font-bold">@Linkol</div>
+        <!-- 底部Logo -->
+        <div class="absolute bottom-[35px] left-[150px]">
+          <!-- 品牌名称 -->
+          <div class="text-black text-left font-kyiv">
+            <div id="brand-name" class="text-[53px] font-bold leading-none">
+              Linkol
+            </div>
+            <div id="username" class="text-[31px] font-bold">@Linkol</div>
+          </div>
         </div>
       </div>
-
-      <!-- 价格显示 -->
-      <div class="flex justify-center items-center mt-[77px] pb-[222px]">
-        <div id="price" class="text-white text-[103px] font-bold font-kyiv">
-          $12,686
-        </div>
-      </div>
-
-      <!-- 底部Logo -->
-      <div class="absolute bottom-[15px] left-[100px]">
-        <img
-          src="./assets/img/linkol-horizontal-light.svg"
-          alt="Linkol Logo"
-          class="w-[260px]"
-        />
-      </div>
+      <span
+        class="!text-[48px] text-black text-center !font-kyiv font-bold absolute bottom-[40px] left-0 w-full"
+      >
+        tweetvalue.linkol.fun
+      </span>
     </div>
 
     <script>

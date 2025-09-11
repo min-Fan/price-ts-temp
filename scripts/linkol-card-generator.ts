@@ -142,12 +142,17 @@ async function generateLinkolCardImage(
     const linkolHorizontalBuffer = fs.readFileSync(linkolHorizontalPath);
     const linkolHorizontalBase64 = `data:image/png;base64,${linkolHorizontalBuffer.toString('base64')}`;
     
+    // 读取 download-card-bg.png 背景图片
+    const downloadCardBgPath = path.join(assetsDir, "img", "download-card-bg.png");
+    const downloadCardBgBuffer = fs.readFileSync(downloadCardBgPath);
+    const downloadCardBgBase64 = `data:image/png;base64,${downloadCardBgBuffer.toString('base64')}`;
+    
     htmlContent = htmlContent
       .replace('./assets/img/card-bg.png', bgImageBase64)
       .replace('./assets/img/logo-border.png', logoBorderBase64)
-      .replace('./assets/img/linkol-logoicon-light.svg', linkolLogoBase64)
-      .replace('./assets/img/linkol-horizontal-light.svg', linkolHorizontalBase64);
-    
+      .replace('./assets/img/linkol-logoicon-light.png', linkolLogoBase64)
+      .replace('./assets/img/linkol-horizontal-light.png', linkolHorizontalBase64)
+      .replace('./assets/img/download-card-bg.png', downloadCardBgBase64);
     // 添加内联字体样式
     const fontStyle = `
       <style>
