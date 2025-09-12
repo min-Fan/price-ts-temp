@@ -1,12 +1,12 @@
-import { Router } from 'express';
-import path from 'path';
-import fs from 'fs';
-import { generateLinkolCardImage } from '../scripts/linkol-card-generator';
+import { Router } from "express";
+import path from "path";
+import fs from "fs";
+import { generateLinkolCardImage } from "../scripts/linkol-card-generator";
 
 const router = Router();
 
 // 生成Linkol卡片接口
-router.post('/generate', async (req, res) => {
+router.post("/generate", async (req, res) => {
   try {
     const { username } = req.body;
 
@@ -20,20 +20,17 @@ router.post('/generate', async (req, res) => {
     console.log(`开始为 @${username} 生成Linkol卡片...`);
 
     // 获取输出目录
-    const outputDir = path.join(__dirname, '..', 'output');
+    const outputDir = path.join(__dirname, "..", "output");
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
     // 生成卡片
-    await generateLinkolCardImage(username, outputDir);
+    const cardFileDetail = await generateLinkolCardImage(username, outputDir);
 
     // 查找生成的文件
-    const files = fs.readdirSync(outputDir);
-    const cardFile = files.find(
-      (file) =>
-        file.includes(`@${username}_linkol_card_`) && file.endsWith(".png")
-    );
+    const cardFile = cardFileDetail.fileName;
+    console.log("cardFile ==>", cardFile);
 
     if (!cardFile) {
       return res.status(500).json({

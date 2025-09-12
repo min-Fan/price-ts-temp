@@ -66,7 +66,7 @@ async function getPriceData(screenName: string): Promise<IGetPriceData> {
 async function generateLinkolCardImage(
   screenName: string,
   outputPath: string
-): Promise<void> {
+): Promise<{ fileName: string; fullOutputPath: string }> {
   try {
     console.log(`开始为 @${screenName} 生成Linkol卡片...`);
 
@@ -266,6 +266,10 @@ async function generateLinkolCardImage(
     console.log(`Linkol卡片已保存到: ${fullOutputPath}`);
 
     await browser.close();
+    return {
+      fileName,
+      fullOutputPath,
+    };
   } catch (error) {
     console.error("生成Linkol卡片时出错:", error);
     throw error;
